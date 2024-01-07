@@ -10,16 +10,18 @@ using WebGL through Three.js.
 To run this project locally, follow the [Three.js installation guide](https://threejs.org/docs/#manual/en/introduction/Installation).
 
 Make sure that you run these commands in whichever folder you are putting your html, js and css files:
-%npm install --save three
-%npm install --save-dev vite
 
 ```bash
 npm install --save three
 npm install --save-dev vite
 ```
+This will install three.js and a build tool Vite in your project folder.
 
-Start your server using 
-%npx serve .
+Now start your server using 
+
+```bash
+npx serve .
+```
 
 Go to http://localhost:58446 (or whichever port your service is in) and
 this is what you will see in the browser (for the twoCubes demo):
