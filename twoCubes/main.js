@@ -44,19 +44,22 @@ function init() {
 
 
 	// Add lights
+	// White light from the bottom right.
 	const dirLight1 = new THREE.DirectionalLight(0xffffff, 0.5);
 	dirLight1.position.set(20, -21, 0).normalize();
 	dirLight1.color.setHSL(0.1, 0.7, 0.8);
 	scene.add(dirLight1);
 
+	// Green light from the top right.
 	const dirLight2 = new THREE.DirectionalLight(0xffffff, 0.5);
 	dirLight2.position.set(20, 21, 0).normalize();
-	dirLight2.color.setHSL(0.1, 0.7, 0.8);
+	dirLight2.color.setHSL(0.3, 0.7, 0.5);
 	scene.add(dirLight2); 
 
+	// Purple light from the bottom left.
 	const dirLight3 = new THREE.DirectionalLight(0xffffff, 0.8);
-	dirLight3.position.set(20, -20, 20).normalize();
-	dirLight3.color.setHSL(0.1, 0.7, 0.8);
+	dirLight3.position.set(-20, 20, 20).normalize();
+	dirLight3.color.setHSL(0.6, 0.7, 0.5);
 	scene.add(dirLight3);  
 
 
