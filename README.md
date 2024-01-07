@@ -13,6 +13,11 @@ Make sure that you run these commands in whichever folder you are putting your h
 %npm install --save three
 %npm install --save-dev vite
 
+```bash
+npm install --save three
+npm install --save-dev vite
+```
+
 Start your server using 
 %npx serve .
 
