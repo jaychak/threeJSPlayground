@@ -28,8 +28,11 @@ this is what you will see in the browser (for the twoCubes demo):
 ![Two Cubes Simulation](images/twoCubes.png)
 
 You can move around the scene using Fly Controls:
--WASD move
--R|F up/down
--Q|E roll
--up|down pitch
--left|right yaw
+
+| Key      | Description |
+| ----------- | ----------- |
+| WASD        | Move        |
+| R | F       | Up/Down     |
+| Q | E       | Roll        |
+| up | down   | Pitch       |
+| left | right  | Yaw       |
