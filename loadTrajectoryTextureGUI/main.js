@@ -7,14 +7,33 @@ import {
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
-
-//const fileInput;
-
 let stats;
 let controls;
 let container;
 let renderer;
 const clock = new THREE.Clock();
+
+// GUI settings object
+const guiSettings = {
+	max_poses: 500, // Max num of poses we want to load in
+	imageRootPath: 'images/01/left/', // Path of images used to texture camera frustra
+	start_img_idx: 50, // Start image idx
+	num_skip_frames: 10
+  };
+  
+function initGUI() {
+const gui = new dat.GUI();
+gui.add(guiSettings, 'max_poses', 1, 1000).name('Max Poses').onChange(updateMaxPoses);
+gui.add(guiSettings, 'imageRootPath').name('Image Root Path');
+gui.add(guiSettings, 'start_img_idx', 0, 1000).name('Start Image Index');
+gui.add(guiSettings, 'num_skip_frames', 1, 30).name('Skip Frames');
+}
+
+function updateMaxPoses(value) {
+// This function will be called when 'max_poses' changes.
+// You can implement what should happen when this value changes.
+// For example, you might want to reload the trajectory.
+}
 
 function init() {
 	container = document.createElement('div');
@@ -84,10 +103,6 @@ function init() {
 	dirLight4.color.setHSL(0.1, 0.7, 0.5);
 	scene.add(dirLight4);
 
-	// const dirLight5 = new THREE.DirectionalLight(0xffffff, 1); // Increase directional light intensity
-	// dirLight5.position.set(5, 5, 5);
-	// scene.add(dirLight5);
-
 	// Ambient light to uniformly illuminate the scene
 	const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
 	scene.add(ambientLight);
@@ -135,14 +150,14 @@ function processCameraTrajectory(contents) {
 
 	let pose_idx = 0;
 
-	const max_poses = 500; // Max num of poses we want to load in
-	const imageRootPath = 'images/01/left/'; // Path of images used to texture camera frustra
-	const start_img_idx = 50; // Start image idx
-	const num_skip_frames = 10;
+	// const max_poses = 500; // Max num of poses we want to load in
+	// const imageRootPath = 'images/01/left/'; // Path of images used to texture camera frustra
+	// const start_img_idx = 50; // Start image idx
+	// const num_skip_frames = 10;
 
     for (let line of lines) {
         const elements = line.split(' ').map(Number);
-        if (elements.length === 12 && pose_idx < max_poses && pose_idx % num_skip_frames == 0) {//
+        if (elements.length === 12 && pose_idx < guiSettings.max_poses && pose_idx % guiSettings.num_skip_frames == 0) {//
             const matrix = [
                 [elements[0], elements[1], elements[2], elements[3]],
                 [elements[4], elements[5], elements[6], elements[7]],
@@ -162,27 +177,7 @@ function processCameraTrajectory(contents) {
                 0, 0, 0, 1
             );
 
-            // // Plain square for each camera
-			// const squareGeometry = new THREE.PlaneGeometry(1, 1); // 1x1 square
-			// //const squareMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide });
-			// const squareMaterial = new THREE.MeshPhongMaterial({ 
-			// 	color: 0xffffff, // White color
-			// 	side: THREE.DoubleSide,
-			// 	specular: 0xffffff, //0x050505, // Specular highlights
-			// 	shininess: 50 // Shininess of the material
-			// });
-
-			// const square = new THREE.Mesh(squareGeometry, squareMaterial);
-			// //square.rotation.x = Math.PI / 2; // Rotate to make it horizontal
-
-			// square.position.copy(positionVec);
-			// square.setRotationFromMatrix(rotMatrix);
-			// scene.add(square);
-			// //square.position.y = square.position.y - 0.5;
-			// //square.position.y = -0.5; // Adjust position to where you want the base of the frustum
-			// // End Plain square for each camera
-
-			createTexturedPlane(positionVec, rotMatrix, imageRootPath, pose_idx+start_img_idx);
+			createTexturedPlane(positionVec, rotMatrix, guiSettings.imageRootPath, pose_idx+guiSettings.start_img_idx);
 			//scene.add(plane);
 
         }
@@ -194,14 +189,6 @@ function processCameraTrajectory(contents) {
 
 async function createTexturedPlane(positionVec, rotMatrix, imageRootPath, pose_idx) {
 	const imagePath = imageRootPath + pose_idx + '.png';// '50.png'
-	//const texture = await loadTexture(imagePath);
-	//const material = new THREE.MeshBasicMaterial({ map: texture });
-	// const material = new THREE.MeshPhongMaterial({ 
-	// 		color: 0xffffff, // White color
-	// 		side: THREE.DoubleSide,
-	// 		specular: 0xffffff, //0x050505, // Specular highlights
-	// 		shininess: 50 // Shininess of the material
-	// 	});
 
 	loadTexture1(imagePath).then(texture => {
 		const material = new THREE.MeshBasicMaterial({
@@ -210,11 +197,6 @@ async function createTexturedPlane(positionVec, rotMatrix, imageRootPath, pose_i
 	
 		const planeGeometry = new THREE.PlaneGeometry(1, 1);
 		const plane = new THREE.Mesh(planeGeometry, material);
-	
-		// // Set the position and add the plane to the scene
-		// plane.position.copy(positionVec); // Set position
-		// plane.setRotationFromMatrix(rotMatrix); // Set rotation
-		// scene.add(plane);
 
 		// Create an outline for the plane
         const outline = createPlaneOutline(1);
@@ -250,13 +232,6 @@ async function createTexturedPlane(positionVec, rotMatrix, imageRootPath, pose_i
 		scene.add(plane);
 	});
 
-
-	// const planeGeometry = new THREE.PlaneGeometry(1, 1);
-	// const plane = new THREE.Mesh(planeGeometry, material);
-	// plane.position.copy(positionVec);
-	// plane.setRotationFromMatrix(rotMatrix);
-	// scene.add(plane);
-	//return plane;
 }
 
 function createPlaneOutline(size) {
@@ -277,43 +252,7 @@ function createPlaneOutline(size) {
 }
 
 
-//const loader = new THREE.TextureLoader();
-
-function loadTexture(imagePath) {
-    return new Promise((resolve, reject) => {
-        loader.load(imagePath, texture => {
-            resolve(texture);
-        }, undefined, error => {
-            reject(error);
-        });
-    });
-}
-
 function loadTexture1(imagePath) {
-	// // instantiate a loader
-	// const loader = new THREE.TextureLoader();
-
-	// // load a resource
-	// loader.load(
-	// 	// resource URL
-	// 	imagePath,
-
-	// 	// onLoad callback
-	// 	function ( texture ) {
-	// 		// in this example we create the material when the texture is loaded
-	// 		const material = new THREE.MeshBasicMaterial( {
-	// 			map: texture
-	// 		} );
-	// 	},
-
-	// 	// onProgress callback currently not supported
-	// 	undefined,
-
-	// 	// onError callback
-	// 	function ( err ) {
-	// 		console.error( 'Could not load texture.' );
-	// 	}
-	// );
 	return new Promise((resolve, reject) => {
         const loader = new THREE.TextureLoader();
         loader.load(
@@ -331,21 +270,6 @@ function loadTexture1(imagePath) {
     });
 }
 
-// function createCubeAtPoint(point) {
-// 	// const geometry = new THREE.BoxGeometry( 1, 1, 1 );
-// 	// const material = new THREE.MeshPhongMaterial( { color: 0xffffff,
-// 	//   specular: 0xffffff,
-// 	//   shininess: 50 } );
-//     const geometry = new THREE.BoxGeometry(100, 100, 100); // Smaller geometry for trajectory points
-//     const material = new THREE.MeshBasicMaterial({color: 0xff0000}); // Red color for visibility
-//     const cube = new THREE.Mesh(geometry, material);
-
-//     cube.position.copy(point);
-// 	// cube.position.x = cube1.position.x + point.x;
-// 	// cube.position.y = cube1.position.y +point.y;
-// 	// cube.position.z = 0;
-//     scene.add(cube);
-// }
 
 function createCubeAtPoint(position) {
     const geometry = new THREE.BoxGeometry(1, 1, 1);
@@ -384,5 +308,6 @@ function render() {
 	renderer.render(scene, camera);
 }
 
+initGUI();
 init();
 animate();
